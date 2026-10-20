@@ -214,9 +214,10 @@ html
     </header>
 
     <div class="nav">
-      <button class="active" onclick="switchTab('dict')">Dictionary</button>
-      <button onclick="switchTab('flashcards')">Flashcards</button>
-      <button onclick="switchTab('quiz')">Quick Quiz</button>
+     <button class="active" onclick="switchTab('dict')">Dictionary</button>
+     <button onclick="switchTab('flashcards')">Flashcards</button>
+     <button onclick="switchTab('quiz')">Quick Quiz</button>
+     <button onclick="switchTab('translator')">Translator</button> <!-- NEW -->
     </div>
 
     <!-- DICTIONARY VIEW -->
@@ -3101,6 +3102,205 @@ html
 
     renderAlphaBar();
     renderDictionary(vocabulary);
+ // 1. Curated sentence & idiom library from Harrington & Applegate texts
+const sentenceCorpus = [
+  {
+    english: "the dog barks",
+    samala: "siwon a huču",
+    breakdown: "s-iwon (it sounds) + ha (the) + huču (dog)"
+  },
+  {
+    english: "the dog is sleeping",
+    samala: "sweʼ a huču",
+    breakdown: "s-weʼ (it sleeps) + ha (the) + huču (dog)"
+  },
+  {
+    english: "the food is good",
+    samala: "malamašɨn i ščʰoho",
+    breakdown: "ma al-am-ašɨn (the food) + hi s-čʰoho (it is good)"
+  },
+  {
+    english: "my house",
+    samala: "ma kʼap",
+    breakdown: "ma (the) + k- (my) + ʼap (house)"
+  },
+  {
+    english: "your house",
+    samala: "ma pʼap",
+    breakdown: "ma (the) + p- (your) + ʼap (house)"
+  },
+  {
+    english: "his house",
+    samala: "ma sʼap",
+    breakdown: "ma (the) + s- (his/her) + ʼap (house)"
+  },
+  {
+    english: "I don't know",
+    samala: "ʼinikčʼamɨn",
+    breakdown: "ʼini- (not) + k- (I) + čʼamɨn (know)"
+  },
+  {
+    english: "he doesn't know",
+    samala: "ʼiniščʼamɨn",
+    breakdown: "ʼini- (not) + s- (he/she) + čʼamɨn (know)"
+  },
+  {
+    english: "I don't want to see them",
+    samala: "ʼiniksilikutiwun",
+    breakdown: "ʼini- (not) + k- (I) + sili- (want) + kuti (see) + -wun (them)"
+  },
+  {
+    english: "where did the child go",
+    samala: "tak anaʼn a čʼičʼiʼ?",
+    breakdown: "takaʼ (where) + ha al-naʼn (that goes) + ha čʼičʼiʼ (the child)"
+  },
+  {
+    english: "what is your name",
+    samala: "ti sʼip a ptɨ?",
+    breakdown: "ti (what) + s-ʼip (one says) + ha p-tɨ (your name)"
+  },
+  {
+    english: "thank you",
+    samala: "kaqʰinalin",
+    breakdown: "k- (I) + aqʰinaʼ (grateful) + -in (to you)"
+  },
+  {
+    english: "you're welcome",
+    samala: "kaličʰo",
+    breakdown: "k- (I) + ali-čʰo (pleased to)"
+  },
+  {
+    english: "hello friend",
+    samala: "haku čʼantɨk",
+    breakdown: "haku (hello) + čʼantɨk (friend)"
+  },
+  {
+    english: "I see what you find",
+    samala: "kʰuti hapalištɨʼ",
+    breakdown: "k-kuti (I see) + ha p-al-ištɨʼ (what you find)"
+  },
+  {
+    english: "the rock is white",
+    samala: "sʼoʼwow a xɨp",
+    breakdown: "s-ʼoʼwow (it is white) + ha xɨp (the rock)"
+  },
+  {
+    english: "the rock is red",
+    samala: "s-tasɨn a xɨp",
+    breakdown: "s-tasɨn (it is red) + ha xɨp (the rock)"
+  },
+  {
+    english: "I will go",
+    samala: "noknaʼn",
+    breakdown: "no- (future) + k- (I) + naʼn (go)"
+  },
+  {
+    english: "don't cry",
+    samala: "pamiš!",
+    breakdown: "p-al- (don't you) + miš (cry)"
+  }
+];
+
+// 2. Translation engine
+function translateSentence() {
+  const rawInput = document.getElementById("transInput").value.trim();
+  if (!rawInput) return;
+
+  const clean = rawInput.toLowerCase().replace(/[?!.,]/g, "").trim();
+  const outBox = document.getElementById("transOutput");
+  const resLabel = document.getElementById("transResult");
+  const bdLabel = document.getElementById("transBreakdown");
+
+  outBox.style.display = "block";
+
+  // Tier 1: Check exact or close match in sentence corpus
+  const directMatch = sentenceCorpus.find(item => {
+    const itemClean = item.english.toLowerCase().replace(/[?!.,]/g, "").trim();
+    return itemClean === clean || clean.includes(itemClean);
+  });
+
+  if (directMatch) {
+    resLabel.textContent = directMatch.samala;
+    bdLabel.innerHTML = `<strong>Grammar Breakdown:</strong> ${directMatch.breakdown}`;
+    return;
+  }
+
+  // Tier 2: Rule-Based Morphological Assembler (Subject + Intention + Verb / Noun)
+  let prefix = "";
+  let prefixDesc = [];
+  let workingText = clean;
+
+  // Detect negative
+  let isNegative = false;
+  if (workingText.includes("don't") || workingText.includes("do not") || workingText.includes("doesn't") || workingText.includes("not")) {
+    isNegative = true;
+    prefix += "ʼini-";
+    prefixDesc.push("ʼini- (not)");
+    workingText = workingText.replace(/(don't|do not|doesn't|not)/g, "").trim();
+  }
+
+  // Detect Subject Person
+  let subj = "";
+  if (workingText.startsWith("i ") || workingText.includes(" i ")) {
+    subj = "k-";
+    prefixDesc.push("k- (I)");
+  } else if (workingText.startsWith("you ") || workingText.includes(" you ")) {
+    subj = "p-";
+    prefixDesc.push("p- (you)");
+  } else if (workingText.startsWith("we ") || workingText.includes(" we ")) {
+    subj = "k-iy-";
+    prefixDesc.push("k-iy- (we)");
+  } else if (workingText.startsWith("they ") || workingText.includes(" they ")) {
+    subj = "s-iy-";
+    prefixDesc.push("s-iy- (they)");
+  } else if (workingText.startsWith("he ") || workingText.startsWith("she ") || workingText.startsWith("it ")) {
+    subj = "s-";
+    prefixDesc.push("s- (he/she/it)");
+  }
+
+  // Detect Desiderative ("want to")
+  if (workingText.includes("want to") || workingText.includes("wants to")) {
+    prefix += subj + "sili-";
+    prefixDesc.push("sili- (want to)");
+    workingText = workingText.replace(/(want to|wants to)/g, "").trim();
+  } else if (subj) {
+    prefix += subj;
+  }
+
+  // Search remaining keywords in dictionary
+  const words = workingText.split(/\s+/);
+  let matchedWord = null;
+
+  for (let w of words) {
+    if (["the", "a", "an", "to", "is", "am", "are"].includes(w)) continue;
+    matchedWord = vocabulary.find(v => {
+      const eng = v.english.toLowerCase();
+      return eng.split(/[,;/ ]+/).includes(w);
+    });
+    if (matchedWord) break;
+  }
+
+  if (matchedWord) {
+    let fullSamala = prefix ? `${prefix}${matchedWord.samala}` : matchedWord.samala;
+    // Sibilant harmony adjustment for s- + hushing consonant
+    if (fullSamala.startsWith("s-") && (matchedWord.samala.includes("š") || matchedWord.samala.includes("č"))) {
+      fullSamala = fullSamala.replace(/^s-/, "š-");
+    }
+
+    resLabel.textContent = fullSamala;
+    let parts = prefixDesc.length > 0 ? prefixDesc.join(" + ") + ` + ${matchedWord.samala} (${matchedWord.english})` : `Word match: ${matchedWord.english}`;
+    bdLabel.innerHTML = `<strong>Synthesized Construction:</strong><br>${parts}<br><em style="color:#64748b; font-size:0.85rem;">Note: In Sʰamala, prefixes attach directly to verb/noun roots.</em>`;
+  } else {
+    resLabel.textContent = "Word / phrase not found yet";
+    bdLabel.innerHTML = `We could not find an exact match for <em>"${rawInput}"</em>. Try searching for the individual root word in the <strong>Dictionary</strong> tab!`;
+  }
+}
+
+function quickTranslate(text) {
+  document.getElementById("transInput").value = text;
+  translateSentence();
+}
+
   </script>
 </body>
 </html>
