@@ -214,11 +214,20 @@ html
     </header>
 
     <div class="nav">
-     <button class="active" onclick="switchTab('dict')">Dictionary</button>
-     <button onclick="switchTab('flashcards')">Flashcards</button>
-     <button onclick="switchTab('quiz')">Quick Quiz</button>
-     <button onclick="switchTab('translator')">Translator</button> <!-- NEW -->
-    </div>
+     function switchTab(tabId) {
+  document.querySelectorAll(".tab-content").forEach(el => el.classList.remove("active"));
+  document.querySelectorAll(".nav button").forEach(el => el.classList.remove("active"));
+  
+  const target = document.getElementById("tab-" + tabId);
+  if (target) target.classList.add("active");
+  
+  if (window.event && window.event.target) {
+    window.event.target.classList.add("active");
+  }
+
+  if (tabId === "flashcards") renderFlashcard();
+  if (tabId === "quiz") setupQuizQuestion();
+}
 
     <!-- DICTIONARY VIEW -->
     <section id="tab-dict" class="tab-content active">
@@ -263,6 +272,33 @@ html
       </div>
     </section>
   </div>
+ 
+  <!-- INSERT THIS RIGHT HERE (TRANSLATOR VIEW) -->
+<section id="tab-translator" class="tab-content">
+  <div style="max-width: 650px; margin: 1.5rem auto; padding: 1.5rem; background: #ffffff; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); border: 1px solid #e2e8f0;">
+    <h3 style="margin-top: 0; color: #1e293b; font-size: 1.4rem;">English to Sʰamala Translator</h3>
+    <p style="color: #64748b; font-size: 0.9rem; margin-bottom: 1.2rem;">Type an English phrase or sentence to see its Sʰamala equivalent and grammatical breakdown.</p>
+    
+    <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
+      <input type="text" id="transInput" class="search-bar" placeholder="e.g. the dog barks, I don't know, my house..." style="flex: 1; padding: 0.75rem 1rem; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 1rem;" onkeydown="if(event.key === 'Enter') translateSentence()" />
+      <button class="btn" onclick="translateSentence()" style="padding: 0.75rem 1.25rem; background: #0284c7; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">Translate</button>
+    </div>
+
+    <div style="font-size: 0.85rem; color: #64748b; margin-bottom: 1.2rem;">
+      Try examples: 
+      <a href="javascript:void(0)" onclick="quickTranslate('the dog barks')" style="color: #0284c7; margin-right: 8px; text-decoration: underline;">the dog barks</a>
+      <a href="javascript:void(0)" onclick="quickTranslate('I don\'t know')" style="color: #0284c7; margin-right: 8px; text-decoration: underline;">I don't know</a>
+      <a href="javascript:void(0)" onclick="quickTranslate('the food is good')" style="color: #0284c7; margin-right: 8px; text-decoration: underline;">the food is good</a>
+      <a href="javascript:void(0)" onclick="quickTranslate('my house')" style="color: #0284c7; text-decoration: underline;">my house</a>
+    </div>
+
+    <div id="transOutput" style="display: none; padding: 1.25rem; border-radius: 8px; background: #f8fafc; border: 1px solid #cbd5e1;">
+      <div style="font-size: 0.8rem; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em;">Sʰamala Translation</div>
+      <div id="transResult" class="samala-word" style="font-size: 1.8rem; color: #0f172a; margin: 0.5rem 0; font-weight: bold;"></div>
+      <div id="transBreakdown" style="font-size: 0.95rem; color: #475569; margin-top: 0.5rem; line-height: 1.5;"></div>
+    </div>
+  </div>
+</section>
 
   <script>
     const vocabulary = [
@@ -3102,6 +3138,121 @@ html
 
     renderAlphaBar();
     renderDictionary(vocabulary);
+    // --- TRANSLATOR DATABASE & ENGINE ---
+const sentenceCorpus = [
+  { english: "the dog barks", samala: "siwon a huču", breakdown: "s-iwon (it sounds) + ha (the) + huču (dog)" },
+  { english: "the dog is sleeping", samala: "sweʼ a huču", breakdown: "s-weʼ (it sleeps) + ha (the) + huču (dog)" },
+  { english: "the dog sleeps", samala: "sweʼ a huču", breakdown: "s-weʼ (it sleeps) + ha (the) + huču (dog)" },
+  { english: "the food is good", samala: "malamašɨn i ščʰoho", breakdown: "ma al-am-ašɨn (the food) + hi s-čʰoho (it is good)" },
+  { english: "my house", samala: "ma kʼap", breakdown: "ma (the) + k- (my) + ʼap (house)" },
+  { english: "your house", samala: "ma pʼap", breakdown: "ma (the) + p- (your) + ʼap (house)" },
+  { english: "his house", samala: "ma sʼap", breakdown: "ma (the) + s- (his/her) + ʼap (house)" },
+  { english: "her house", samala: "ma sʼap", breakdown: "ma (the) + s- (his/her) + ʼap (house)" },
+  { english: "I don't know", samala: "ʼinikčʼamɨn", breakdown: "ʼini- (not) + k- (I) + čʼamɨn (know)" },
+  { english: "he doesn't know", samala: "ʼiniščʼamɨn", breakdown: "ʼini- (not) + s- (he/she) + čʼamɨn (know)" },
+  { english: "I don't want to see them", samala: "ʼiniksilikutiwun", breakdown: "ʼini- (not) + k- (I) + sili- (want) + kuti (see) + -wun (them)" },
+  { english: "where did the child go", samala: "tak anaʼn a čʼičʼiʼ?", breakdown: "takaʼ (where) + ha al-naʼn (that goes) + ha čʼičʼiʼ (the child)" },
+  { english: "what is your name", samala: "ti sʼip a ptɨ?", breakdown: "ti (what) + s-ʼip (one says) + ha p-tɨ (your name)" },
+  { english: "thank you", samala: "kaqʰinalin", breakdown: "k- (I) + aqʰinaʼ (grateful) + -in (to you)" },
+  { english: "you're welcome", samala: "kaličʰo", breakdown: "k- (I) + ali-čʰo (pleased to)" },
+  { english: "hello friend", samala: "haku čʼantɨk", breakdown: "haku (hello) + čʼantɨk (friend)" },
+  { english: "I see what you find", samala: "kʰuti hapalištɨʼ", breakdown: "k-kuti (I see) + ha p-al-ištɨʼ (what you find)" },
+  { english: "the rock is white", samala: "sʼoʼwow a xɨp", breakdown: "s-ʼoʼwow (it is white) + ha xɨp (the rock)" },
+  { english: "the rock is red", samala: "s-tasɨn a xɨp", breakdown: "s-tasɨn (it is red) + ha xɨp (the rock)" },
+  { english: "I will go", samala: "noknaʼn", breakdown: "no- (future) + k- (I) + naʼn (go)" },
+  { english: "don't cry", samala: "pamiš!", breakdown: "p-al- (don't you) + miš (cry)" }
+];
+
+function translateSentence() {
+  const rawInput = document.getElementById("transInput").value.trim();
+  if (!rawInput) return;
+
+  const clean = rawInput.toLowerCase().replace(/[?!.,]/g, "").trim();
+  const outBox = document.getElementById("transOutput");
+  const resLabel = document.getElementById("transResult");
+  const bdLabel = document.getElementById("transBreakdown");
+
+  outBox.style.display = "block";
+
+  // Match against curated sentences
+  const directMatch = sentenceCorpus.find(item => {
+    const itemClean = item.english.toLowerCase().replace(/[?!.,]/g, "").trim();
+    return itemClean === clean || clean.includes(itemClean);
+  });
+
+  if (directMatch) {
+    resLabel.textContent = directMatch.samala;
+    bdLabel.innerHTML = `<strong>Grammar Breakdown:</strong> ${directMatch.breakdown}`;
+    return;
+  }
+
+  // Fallback: Morphological prefix analysis
+  let prefix = "";
+  let prefixDesc = [];
+  let workingText = clean;
+
+  if (workingText.includes("don't") || workingText.includes("do not") || workingText.includes("doesn't") || workingText.includes("not")) {
+    prefix += "ʼini-";
+    prefixDesc.push("ʼini- (not)");
+    workingText = workingText.replace(/(don't|do not|doesn't|not)/g, "").trim();
+  }
+
+  let subj = "";
+  if (workingText.startsWith("i ") || workingText.includes(" i ")) {
+    subj = "k-";
+    prefixDesc.push("k- (I)");
+  } else if (workingText.startsWith("you ") || workingText.includes(" you ")) {
+    subj = "p-";
+    prefixDesc.push("p- (you)");
+  } else if (workingText.startsWith("we ") || workingText.includes(" we ")) {
+    subj = "k-iy-";
+    prefixDesc.push("k-iy- (we)");
+  } else if (workingText.startsWith("they ") || workingText.includes(" they ")) {
+    subj = "s-iy-";
+    prefixDesc.push("s-iy- (they)");
+  } else if (workingText.startsWith("he ") || workingText.startsWith("she ") || workingText.startsWith("it ")) {
+    subj = "s-";
+    prefixDesc.push("s- (he/she/it)");
+  }
+
+  if (workingText.includes("want to") || workingText.includes("wants to")) {
+    prefix += subj + "sili-";
+    prefixDesc.push("sili- (want to)");
+    workingText = workingText.replace(/(want to|wants to)/g, "").trim();
+  } else if (subj) {
+    prefix += subj;
+  }
+
+  const words = workingText.split(/\s+/);
+  let matchedWord = null;
+
+  for (let w of words) {
+    if (["the", "a", "an", "to", "is", "am", "are"].includes(w)) continue;
+    matchedWord = vocabulary.find(v => {
+      const eng = v.english.toLowerCase();
+      return eng.split(/[,;/ ]+/).includes(w);
+    });
+    if (matchedWord) break;
+  }
+
+  if (matchedWord) {
+    let fullSamala = prefix ? `${prefix}${matchedWord.samala}` : matchedWord.samala;
+    if (fullSamala.startsWith("s-") && (matchedWord.samala.includes("š") || matchedWord.samala.includes("č"))) {
+      fullSamala = fullSamala.replace(/^s-/, "š-");
+    }
+    resLabel.textContent = fullSamala;
+    let parts = prefixDesc.length > 0 ? prefixDesc.join(" + ") + ` + ${matchedWord.samala} (${matchedWord.english})` : `Word match: ${matchedWord.english}`;
+    bdLabel.innerHTML = `<strong>Synthesized Construction:</strong><br>${parts}<br><em style="color:#64748b; font-size:0.85rem;">Note: In Sʰamala, prefixes attach directly to verb/noun roots.</em>`;
+  } else {
+    resLabel.textContent = "Word / phrase not found yet";
+    bdLabel.innerHTML = `We could not find an exact match for <em>"${rawInput}"</em>. Try searching for the individual root word in the <strong>Dictionary</strong> tab!`;
+  }
+}
+
+function quickTranslate(text) {
+  document.getElementById("transInput").value = text;
+  translateSentence();
+    
  // 1. Curated sentence & idiom library from Harrington & Applegate texts
 const sentenceCorpus = [
   {
