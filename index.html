@@ -4297,7 +4297,43 @@
       { samala: "ʼalaxutxutiwil", english: "a very talkative person, chatterbox", notes: "< ʼal- + axutiwil + reduplication" },
       { samala: "ʼalaxutiwilašʼinaš", english: "sacred prayer, spiritual oration", notes: "< ʼalaxutiwilašʼin + -vš" },
       { samala: "naxutiwil", english: "to speak on another\\'s behalf, serve as advocate", notes: "< nu- + axuti-wil" },
-      { samala: "saxwawakan", english: "to scream, yell continually", notes: "< axwakan + reduplication" }
+      { samala: "saxwawakan", english: "to scream, yell continually", notes: "< axwakan + reduplication" },
+            // --- ESSENTIAL SENTENCE-BUILDING & GRAMMAR CONSTRUCTS ---
+      // Question & Interrogative Words
+      { samala: "sukʼu", english: "what, which, something, anything", notes: "general question word & relative pronoun; e.g. sukʼu heʼ? 'what is this?'" },
+      { samala: "ti", english: "what (used before verbs)", notes: "question word before verbs; e.g. ti sʼip? 'what is he saying?'" },
+      { samala: "sukʼiku", english: "what is it?, what?", notes: "standalone question word; e.g. sukʼiku heʼ? 'what is this?'" },
+      { samala: "kuneʼ", english: "who, someone, anyone", notes: "interrogative & relative pronoun; e.g. kun i piʼ? 'who are you?'" },
+      { samala: "takaʼ", english: "where, somewhere", notes: "question & locative word; e.g. takaʼ ha ʼap? 'where is the house?'" },
+      { samala: "ʼašnɨm", english: "when? (interrogative question)", notes: "only for questions; e.g. ʼašnɨm ku pnaʼnawaš? 'when will you go?'" },
+      { samala: "moq", english: "when, while, whenever (relative time)", notes: "used for statements/relative time: moq syuwil 'when it is hot'" },
+      { samala: "hini", english: "when, at the time that (past/relative)", notes: "relative time: hini kčʼičʼiʼ 'when I was a child'" },
+      { samala: "takʼu", english: "how, in what way", notes: "manner question word; e.g. takʼu knetus? 'how shall I do it?'" },
+      { samala: "tikaliʼ", english: "how, how much, how many, which one", notes: "quantity/condition; e.g. haku tikaliʼ 'hello, how are you?'" },
+      { samala: "tišneč", english: "why (literally 'what makes it so?')", notes: "< ti 'what' + š-neč 'it does'; e.g. tišneč a pmiš? 'why do you cry?'" },
+
+      // Needs, Wants & Modals
+      { samala: "sili-", english: "to want to, desire to (prefix)", notes: "desiderative verb prefix; e.g. ksiliwil 'I want', ksilinaʼn 'I want to go'" },
+      { samala: "siliwil -us", english: "to want (an object or action)", notes: "< sili- 'want' + wil 'exist'; e.g. ksiliwilus a qʰoʼ 'I want a pet'" },
+      { samala: "aqtikat", english: "to need, require", notes: "< aqti- + =kat; e.g. ʼinsil a kalaqtikat 'I don\\'t need anything'" },
+      { samala: "alaqtikač", english: "necessary, needed, requirement", notes: "< al-aqti-kat-š; e.g. moqʼe swil alaqtikač 'everything needed is there'" },
+      { samala: "nitʰoy", english: "to be able to, can", notes: "ability/possibility; e.g. ʼinišnitʰoy 'it is not possible', knitʰoy 'I can'" },
+      { samala: "kʼus", english: "must, should, ought to", notes: "obligation particle after verb; e.g. pnaʼn a kʼus 'you must go'" },
+      { samala: "či", english: "should, ought to, expected to", notes: "modal obligation particle; e.g. či kinaʼn 'we should go'" },
+
+      // Logic, Clauses & Connectives
+      { samala: "kačʼa", english: "because, since", notes: "causal conjunction (also kaʼčʰa); e.g. kačʼa kuxnɨwɨn 'because I am in a hurry'" },
+      { samala: "kanaqšaʼnin", english: "so, therefore, because of that", notes: "consequence connective; also kanaqšaʼn" },
+      { samala: "haʼ", english: "so that, in order to", notes: "purpose conjunction; e.g. towičʼ haʼ pašɨn 'come quick so you can eat!'" },
+      { samala: "haʼni-", english: "so that not, lest (negative purpose)", notes: "< haʼ + ʼini-; e.g. haʼniswax a ʼoʼ 'so that water doesn\\'t leak'" },
+      { samala: "hakʼu", english: "if, whether; if only", notes: "conditional particle; e.g. hakʼu ʼinu 'if it were true'" },
+      { samala: "wa", english: "if, when, as long as (condition)", notes: "conditional clause marker: wa swɨl 'if/when he shoots'" },
+      { samala: "ʼiyapa", english: "even if, even though, although", notes: "concession marker; e.g. ʼiyapa sʼequn 'even though it is old'" },
+      { samala: "hikʰu", english: "but, however, yet", notes: "adversative conjunction; e.g. swaʼyin hikʰu ʼiništuhuy 'it was winter but didn\\'t rain'" },
+      { samala: "kɨm", english: "then, and then, after that", notes: "sequential time connector; e.g. noknaʼn ha kɨm ksuʼinu 'I\\'ll go and then believe'" },
+      { samala: "keʼ", english: "thus, so, in this way, therefore", notes: "demonstrative adverb: keʼ snetus 'she does like so'" },
+      { samala: "kanali", english: "to, toward (destination)", notes: "directional particle; e.g. kanali ʼitiʼ 'to here', kanal a ktɨkʼ 'to my mother'" },
+      { samala: "kawašlɨk", english: "from (origin)", notes: "directional marker: kawašlɨk ʼitiʼ 'from here'" },
     ];
 
     function normalize(str) {
@@ -4510,7 +4546,37 @@
       { english: "the rock is white", samala: "sʼoʼwow a xɨp", breakdown: "s-ʼoʼwow (it is white) + ha xɨp (the rock)" },
       { english: "the rock is red", samala: "s-tasɨn a xɨp", breakdown: "s-tasɨn (it is red) + ha xɨp (the rock)" },
       { english: "I will go", samala: "noknaʼn", breakdown: "no- (future) + k- (I) + naʼn (go)" },
-      { english: "don't cry", samala: "pamiš!", breakdown: "p-al- (don't you) + miš (cry)" }
+      { english: "don't cry", samala: "pamiš!", breakdown: "p-al- (don't you) + miš (cry)" },
+        // Questions & Inquiries
+  { english: "what is this", samala: "sukʼu heʼ?", breakdown: "sukʼu (what) + heʼ (this)" },
+  { english: "what are you doing", samala: "sukʼ a peqwel?", breakdown: "sukʼu (what) + ha (the) + p-eqwel (you do/make)" },
+  { english: "what do you think", samala: "sukʼ a palaqniwil?", breakdown: "sukʼu (what) + ha p-al-aqniwil (what you think)" },
+  { english: "who is this", samala: "kun i heʼ?", breakdown: "kuneʼ (who) + hi + heʼ (this)" },
+  { english: "who are you", samala: "kun i piʼ?", breakdown: "kuneʼ (who) + hi piʼ (you)" },
+  { english: "where is the water", samala: "takaʼ ha ʼoʼ?", breakdown: "takaʼ (where) + ha (the) + ʼoʼ (water)" },
+  { english: "where are you going", samala: "takaʼ a pnaʼn?", breakdown: "takaʼ (where) + ha (the) + p-naʼn (you go)" },
+  { english: "where is my house", samala: "takaʼ ha kʼap?", breakdown: "takaʼ (where) + ha k-ʼap (my house)" },
+  { english: "when will you go", samala: "ʼašnɨm ku pnaʼnawaš?", breakdown: "ʼašnɨm (when) + ku (future) + p-naʼn-waš (you go)" },
+  { english: "why are you crying", samala: "tišneč a pmiš?", breakdown: "tišneč (why) + ha p-miš (you cry)" },
+  { english: "how are you", samala: "haku tikaliʼ?", breakdown: "haku (hello) + tikaliʼ (how is it)" },
+  { english: "how much is it", samala: "tikaliʼ a spiʼw?", breakdown: "tikaliʼ (how much) + ha s-piʼw (its cost/value)" },
+  { english: "how do you do it", samala: "takʼu pnetus?", breakdown: "takʼu (how) + p-net-us (you do to it)" },
+
+  // Wants, Needs & Modals
+  { english: "I want to go", samala: "ksilinaʼn", breakdown: "k- (I) + sili- (want to) + naʼn (go)" },
+  { english: "I want water", samala: "ksiliwilus a ʼoʼ", breakdown: "k-sili-wil-us (I want it) + ha ʼoʼ (the water)" },
+  { english: "I need food", samala: "kaqtikat ha ʼuwumuʼ", breakdown: "k-aqti-kat (I need) + ha ʼuwumuʼ (the food)" },
+  { english: "I don't need anything", samala: "ʼinsil a kalaqtikat", breakdown: "ʼini-s-wil (none exists) + ha k-al-aqti-kat (what I need)" },
+  { english: "can you help me", samala: "pnitʰoy ê ha pʼoyonit?", breakdown: "p-nitʰoy (you can) + hê (question) + ha p-ʼoyon-it (you help me)" },
+  { english: "you must go", samala: "pnaʼn a kʼus", breakdown: "p-naʼn (you go) + ha kʼus (must/should)" },
+  { english: "we should go", samala: "či kinaʼn", breakdown: "či (should) + k-iy-naʼn (we go)" },
+
+  // Compound & Complex sentences
+  { english: "because I am in a hurry", samala: "kačʼa kuxnɨwɨn", breakdown: "kačʼa (because) + k-uxnɨwɨn (I hurry)" },
+  { english: "so that you can eat", samala: "haʼ pašɨn", breakdown: "haʼ (so that) + p-ašɨn (you eat)" },
+  { english: "if it rains", samala: "wa štuhuy", breakdown: "wa (if/when) + s-tuhuy (it rains)" },
+  { english: "I will see you tomorrow", samala: "nokʰutiyin wa sʰɨkʼɨn", breakdown: "no-k-kuti-in (I will see you) + wa s-hɨkʼɨn (tomorrow/morning)" }
+      
     ];
 
     function translateSentence() {
